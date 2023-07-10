@@ -21,8 +21,8 @@ local Window = Rayfield:CreateWindow({
       Title = "Undertale: Wave Rush - Ultimate GUI",
       Subtitle = "Key System",
       Note = "This is a test, the key is 'SUS1010' ",
-      FileName = "SiriusKey",
-      SaveKey = true,
+      FileName = "UT WR",
+      SaveKey = false,
       GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
       Key = "SUS1010"
    }
