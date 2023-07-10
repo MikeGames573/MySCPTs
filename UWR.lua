@@ -16,15 +16,15 @@ local Window = Rayfield:CreateWindow({
       Invite = "sirius", -- The Discord invite code, do not include discord.gg/
       RememberJoins = true -- Set this to false to make them join the discord every time they load it up
    },
-   KeySystem = false, -- Set this to true to use our key system
+   KeySystem = true, -- Set this to true to use our key system
    KeySettings = {
-      Title = "Sirius Hub",
+      Title = "Undertale: Wave Rush - Ultimate GUI",
       Subtitle = "Key System",
-      Note = "Join the discord (discord.gg/sirius)",
+      Note = "This is a test, the key is 'SUS1010' ",
       FileName = "SiriusKey",
       SaveKey = true,
       GrabKeyFromSite = false, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
-      Key = "Hello"
+      Key = "SUS1010"
    }
 })
 
