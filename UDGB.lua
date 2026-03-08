@@ -6,12 +6,13 @@ local allowedPlaces = {
 
 -- Exit early if not in allowed place
 if not allowedPlaces[game.PlaceId] then
+    notify("Game not detected, script not loading!!")
     return
 end
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
-    Name = "SpellForge Hub v1.4.1",
+    Name = "SpellForge Hub v1.4.2",
     Icon = 0,
     LoadingTitle = "SpellForge Hub",
     LoadingSubtitle = "Advanced Spell Tools",
@@ -22,6 +23,13 @@ local Window = Rayfield:CreateWindow({
     },
     ToggleUIKeybind = "K"
 })
+
+Rayfield:Notify({
+   Title = "Game Detected!!",
+   Content = "The GUI is now loading!!",
+   Duration = 6.5
+})
+
 local TeleportTab = Window:CreateTab("Teleport", "home")
 local SpellsTab = Window:CreateTab("Spells", "sparkles")
 local ConfigTab = Window:CreateTab("Config", "settings")
