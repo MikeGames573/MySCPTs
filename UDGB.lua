@@ -10,7 +10,7 @@ if not allowedPlaces[game.PlaceId] then
     return
 end
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/MikeGames573/MySCPTs/refs/heads/main/RF%20(No%20blotware%20edition).lua'))()
 local Window = Rayfield:CreateWindow({
     Name = "Undertale Dungeons Go Beyond v1.5.2",
     Icon = 0,
