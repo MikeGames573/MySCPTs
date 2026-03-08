@@ -82,7 +82,6 @@ end
 local placeId = game.PlaceId
 if placeId == 17387762301 then
     TeleportTab:CreateSection("(Dungeon Starter) Lobby")
-    TeleportTab:CreateSection("(Dungeon Starter) In-game")
     -- REJOIN = FORCED FRESH SERVER (exactly your working method)
     TeleportTab:CreateButton({
         Name = "Rejoin (New Server)",
@@ -110,7 +109,7 @@ if placeId == 17387762301 then
         end,
     })
     TeleportTab:CreateToggle({
-        Name = "Is Solo",
+        Name = "Is Solo (Can bypass level limit if activated)",
         CurrentValue = true,
         Flag = "IsSolo",
         Callback = function(Value)
@@ -138,7 +137,7 @@ if placeId == 17387762301 then
         end,
     })
 elseif placeId == 17616779267 then
-    TeleportTab:CreateSection("In-game")
+    TeleportTab:CreateSection("(Dungeon Starter) In-game")
     -- REJOIN = FORCED FRESH SERVER (exactly your working method)
     TeleportTab:CreateButton({
         Name = "Rejoin (New Server)",
