@@ -23,12 +23,6 @@ local Window = Rayfield:CreateWindow({
     ToggleUIKeybind = "K"
 })
 
-Rayfield:Notify({
-   Title = "Game Detected!!",
-   Content = "The GUI is now loading!!",
-   Duration = 6.5
-})
-
 local TeleportTab = Window:CreateTab("Main", "home")
 local SpellsTab = Window:CreateTab("Spells", "sparkles")
 local ConfigTab = Window:CreateTab("Config", "settings")
@@ -86,14 +80,8 @@ if placeId == 17387762301 then
     TeleportTab:CreateButton({
         Name = "Rejoin (New Server)",
         Callback = function()
-            Rayfield:Notify({
-                Title = "Joining Fresh Server",
-                Content = "Forcing a completely new server (this bypasses started dungeon kick)...",
-                Duration = 5,
-                Image = "refresh-cw"
-            })
             local PlaceId = game.PlaceId
-            player:Kick("\nRejoining to fresh server...")
+            player:Kick("\nRejoining...")
             task.wait(1)
             TeleportService:Teleport(PlaceId) -- No JobId = Roblox gives you a brand new server
         end,
@@ -142,14 +130,8 @@ elseif placeId == 17616779267 then
     TeleportTab:CreateButton({
         Name = "Rejoin (New Server)",
         Callback = function()
-            Rayfield:Notify({
-                Title = "Joining Fresh Server",
-                Content = "Forcing a completely new server (this bypasses started dungeon kick)...",
-                Duration = 5,
-                Image = "refresh-cw"
-            })
             local PlaceId = game.PlaceId
-            player:Kick("\nRejoining to fresh server...")
+            player:Kick("\nRejoining...")
             task.wait(1)
             TeleportService:Teleport(PlaceId) -- No JobId = Roblox gives you a brand new server
         end,
