@@ -12,9 +12,9 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
-    Name = "Undertale Dungeons Go Beyond v1.5",
+    Name = "Undertale Dungeons Go Beyond v1.5.1",
     Icon = 0,
-    LoadingTitle = "Undertale Dungeons Go Beyond v1.5",
+    LoadingTitle = "Undertale Dungeons Go Beyond v1.5.1",
     LoadingSubtitle = "Made by Heli",
     ConfigurationSaving = {
         Enabled = true,
@@ -311,5 +311,25 @@ ConfigTab:CreateToggle({
             Rayfield:Notify({Title = "Queued!", Content = "Script will auto-run after any teleport.", Duration = 6, Image = "refresh-cw"})
         end
     end,
+})
+ConfigTab:CreateLabel(
+	"⚠️ DESTROYS RAYFIELD COMPLETELY", 
+	"alert-triangle", 
+	Color3.fromRGB(255, 0, 0), 
+	false
+)
+ConfigTab:CreateButton({
+	Name = "Destroy Rayfield",
+	Callback = function()
+		Rayfield:Notify({
+			Title = "Rayfield Destroyed",
+			Content = "Interface completely removed.\nScript will no longer show until re-executed.",
+			Duration = 5,
+			Image = "trash-2"
+		})
+		
+		task.wait(1) -- small delay so you can see the notification
+		Rayfield:Destroy() -- This completely erases the entire Rayfield UI, all tabs, sections, toggles, connections, and memory traces
+	end,
 })
 Rayfield:LoadConfiguration()
