@@ -33,6 +33,7 @@ local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
+local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local UseSpellRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("UseSpell")
 local ForceCastEnabled = false
@@ -42,6 +43,21 @@ local slotMap = {
     [Enum.KeyCode.Three] = 3, [Enum.KeyCode.R] = 3,
     [Enum.KeyCode.Four] = 4, [Enum.KeyCode.F] = 4,
 }
+
+local selectedTrinkets = {}
+local trinketSpamConnection = nil
+local trinketOptions = {}
+pcall(function()
+	local trinketsFolder = player:WaitForChild("Trinkets", 5) -- waits up to 5 seconds (safe for both lobby & in-game)
+	if trinketsFolder then
+		for _, child in ipairs(trinketsFolder:GetChildren()) do
+			if child:IsA("Folder") then
+				table.insert(trinketOptions, child.Name)
+			end
+		end
+	end
+end)
+
 -- Shared variables
 local selectedDungeon = ""
 local selectedModifiers = {}
@@ -71,8 +87,76 @@ if artifactsFolder then
     end
 end
 -- =============================================
--- TELEPORT TAB (Lobby or In-game)
+-- MAIN TAB
 -- =============================================
+SpellsTab:CreateSection("Trinket Spam Test")
+
+-- Dropdown: gets every folder name from player.Trinkets and allows multiple selection
+SpellsTab:CreateDropdown({
+	Name = "Select Trinkets (Multiple)",
+	Options = trinketOptions,
+	CurrentOption = {},
+	MultipleOptions = true,
+	Callback = function(Options)
+		selectedTrinkets = Options
+	end,
+})
+
+-- Toggle: "Trinket Spam test" - NO Flag so it NEVER saves to config
+-- Default = off
+-- When ON: equips the selected trinkets in a cycle, every single frame (Heartbeat), zero delay, no lag
+local trinketSpamToggle
+trinketSpamToggle = SpellsTab:CreateToggle({
+	Name = "Trinket Spam test",
+	CurrentValue = false,
+	Callback = function(Value)
+		if Value then
+			-- Safety: can't turn on with nothing selected
+			if #selectedTrinkets == 0 then
+				Rayfield:Notify({
+					Title = "Trinket Spam",
+					Content = "Select at least one trinket first!",
+					Duration = 5,
+					Image = "alert-triangle"
+				})
+				trinketSpamToggle:Set(false)
+				return
+			end
+
+			-- Start infinite frame-by-frame spam
+			if trinketSpamConnection then
+				trinketSpamConnection:Disconnect()
+			end
+
+			local index = 1
+			trinketSpamConnection = RunService.Heartbeat:Connect(function()
+				local count = #selectedTrinkets
+				if count > 0 then
+					-- Safe cycling even if selection changes mid-spam
+					index = ((index - 1) % count) + 1
+					local trinketName = selectedTrinkets[index]
+
+					local trinketsFolder = player:FindFirstChild("Trinkets")
+					if trinketsFolder then
+						local trinket = trinketsFolder:FindFirstChild(trinketName)
+						if trinket then
+							local args = { trinket } -- exact same format you showed
+							ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("EquipTrinket"):FireServer(unpack(args))
+						end
+					end
+
+					index = index + 1
+				end
+			end)
+		else
+			-- Turn off
+			if trinketSpamConnection then
+				trinketSpamConnection:Disconnect()
+				trinketSpamConnection = nil
+			end
+		end
+	end,
+})
 local placeId = game.PlaceId
 if placeId == 17387762301 then
     TeleportTab:CreateSection("(Dungeon Starter) Lobby")
