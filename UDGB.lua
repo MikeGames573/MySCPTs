@@ -1,12 +1,84 @@
-
-
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+-- =============================================
+-- CUSTOM THEMES (Variations of requested colors)
+-- =============================================
+-- "Determination" - Dark red theme based on RGB(150, 0, 0) with natural variations (darker/lighter shades for accents, backgrounds, etc.)
+local DeterminationTheme = {
+    TextColor = Color3.fromRGB(255, 220, 220),
+    Background = Color3.fromRGB(20, 10, 10),
+    Topbar = Color3.fromRGB(35, 15, 15),
+    Shadow = Color3.fromRGB(10, 0, 0),
+    NotificationBackground = Color3.fromRGB(30, 10, 10),
+    NotificationActionsBackground = Color3.fromRGB(50, 20, 20),
+    TabBackground = Color3.fromRGB(40, 15, 15),
+    TabStroke = Color3.fromRGB(70, 20, 20),
+    TabBackgroundSelected = Color3.fromRGB(180, 30, 30), -- Bright red variation
+    TabTextColor = Color3.fromRGB(255, 200, 200),
+    SelectedTabTextColor = Color3.fromRGB(255, 255, 255),
+    ElementBackground = Color3.fromRGB(30, 15, 15),
+    ElementBackgroundHover = Color3.fromRGB(45, 20, 20),
+    SecondaryElementBackground = Color3.fromRGB(20, 10, 10),
+    ElementStroke = Color3.fromRGB(80, 25, 25),
+    SecondaryElementStroke = Color3.fromRGB(55, 20, 20),
+    SliderBackground = Color3.fromRGB(50, 20, 20),
+    SliderProgress = Color3.fromRGB(190, 35, 35), -- Red variation
+    SliderStroke = Color3.fromRGB(220, 60, 60),
+    ToggleBackground = Color3.fromRGB(25, 12, 12),
+    ToggleEnabled = Color3.fromRGB(170, 25, 25), -- Core red variation
+    ToggleDisabled = Color3.fromRGB(80, 30, 30),
+    ToggleEnabledStroke = Color3.fromRGB(210, 50, 50),
+    ToggleDisabledStroke = Color3.fromRGB(100, 40, 40),
+    ToggleEnabledOuterStroke = Color3.fromRGB(240, 80, 80),
+    ToggleDisabledOuterStroke = Color3.fromRGB(55, 20, 20),
+    DropdownSelected = Color3.fromRGB(150, 0, 0), -- Exact base color
+    DropdownUnselected = Color3.fromRGB(30, 15, 15),
+    InputBackground = Color3.fromRGB(25, 12, 12),
+    InputStroke = Color3.fromRGB(75, 25, 25),
+    PlaceholderColor = Color3.fromRGB(180, 100, 100)
+}
+
+-- "HATE" - Deep purple theme based on RGB(17, 0, 31) with natural variations (darker/lighter shades for accents, backgrounds, etc.)
+local HATETheme = {
+    TextColor = Color3.fromRGB(230, 210, 255),
+    Background = Color3.fromRGB(12, 5, 22),
+    Topbar = Color3.fromRGB(22, 8, 32),
+    Shadow = Color3.fromRGB(5, 0, 12),
+    NotificationBackground = Color3.fromRGB(20, 8, 30),
+    NotificationActionsBackground = Color3.fromRGB(35, 12, 45),
+    TabBackground = Color3.fromRGB(25, 8, 35),
+    TabStroke = Color3.fromRGB(45, 12, 55),
+    TabBackgroundSelected = Color3.fromRGB(85, 0, 130), -- Purple variation
+    TabTextColor = Color3.fromRGB(240, 200, 255),
+    SelectedTabTextColor = Color3.fromRGB(255, 255, 255),
+    ElementBackground = Color3.fromRGB(22, 8, 30),
+    ElementBackgroundHover = Color3.fromRGB(32, 12, 42),
+    SecondaryElementBackground = Color3.fromRGB(12, 5, 22),
+    ElementStroke = Color3.fromRGB(55, 15, 70),
+    SecondaryElementStroke = Color3.fromRGB(35, 10, 50),
+    SliderBackground = Color3.fromRGB(32, 12, 42),
+    SliderProgress = Color3.fromRGB(110, 0, 160), -- Purple variation
+    SliderStroke = Color3.fromRGB(140, 20, 190),
+    ToggleBackground = Color3.fromRGB(18, 7, 27),
+    ToggleEnabled = Color3.fromRGB(95, 0, 145), -- Core purple variation
+    ToggleDisabled = Color3.fromRGB(60, 25, 70),
+    ToggleEnabledStroke = Color3.fromRGB(125, 15, 175),
+    ToggleDisabledStroke = Color3.fromRGB(80, 35, 90),
+    ToggleEnabledOuterStroke = Color3.fromRGB(155, 35, 200),
+    ToggleDisabledOuterStroke = Color3.fromRGB(45, 15, 55),
+    DropdownSelected = Color3.fromRGB(17, 0, 31), -- Exact base color
+    DropdownUnselected = Color3.fromRGB(22, 8, 30),
+    InputBackground = Color3.fromRGB(18, 7, 27),
+    InputStroke = Color3.fromRGB(55, 15, 70),
+    PlaceholderColor = Color3.fromRGB(160, 110, 200)
+}
 
 local Window = Rayfield:CreateWindow({
     Name = "SpellForge Hub",
     Icon = 0,
     LoadingTitle = "SpellForge Hub",
     LoadingSubtitle = "Advanced Spell Tools",
+    Theme = DeterminationTheme, -- Determination is now the DEFAULT theme
     ConfigurationSaving = {
         Enabled = true,
         FolderName = "SpellForge",
@@ -26,17 +98,14 @@ local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
-
 local player = Players.LocalPlayer
 local UseSpellRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("UseSpell")
-
 local ForceCastEnabled = false
-
 local slotMap = {
-    [Enum.KeyCode.One]   = 1, [Enum.KeyCode.Q] = 1,
-    [Enum.KeyCode.Two]   = 2, [Enum.KeyCode.E] = 2,
+    [Enum.KeyCode.One] = 1, [Enum.KeyCode.Q] = 1,
+    [Enum.KeyCode.Two] = 2, [Enum.KeyCode.E] = 2,
     [Enum.KeyCode.Three] = 3, [Enum.KeyCode.R] = 3,
-    [Enum.KeyCode.Four]  = 4, [Enum.KeyCode.F] = 4,
+    [Enum.KeyCode.Four] = 4, [Enum.KeyCode.F] = 4,
 }
 
 -- Shared variables
@@ -74,21 +143,19 @@ end
 -- TELEPORT TAB (Lobby or In-game)
 -- =============================================
 local placeId = game.PlaceId
-
 if placeId == 17387762301 then
     TeleportTab:CreateSection("Lobby")
-
     TeleportTab:CreateDropdown({
         Name = "Dungeons",
         Options = dungeonOptions,
         CurrentOption = dungeonOptions[1] and {dungeonOptions[1]} or {},
         MultipleOptions = false,
+        Flag = "DungeonsDropdown",
         Callback = function(Options)
             local display = Options[1] or ""
             selectedDungeon = display:gsub(" %(Might not work%)", "")
         end,
     })
-
     TeleportTab:CreateToggle({
         Name = "Is Solo",
         CurrentValue = true,
@@ -97,17 +164,16 @@ if placeId == 17387762301 then
             isSoloEnabled = Value
         end,
     })
-
     TeleportTab:CreateDropdown({
         Name = "Modifiers (Warning: Doesn't work for every dungeon)",
         Options = modifierOptions,
         CurrentOption = {},
         MultipleOptions = true,
+        Flag = "ModifiersDropdown",
         Callback = function(Options)
             selectedModifiers = Options
         end,
     })
-
     TeleportTab:CreateButton({
         Name = "Start Dungeon",
         Callback = function()
@@ -119,10 +185,8 @@ if placeId == 17387762301 then
             Rayfield:Notify({Title = "Dungeon Started", Content = "Launching " .. selectedDungeon, Duration = 5, Image = "play"})
         end,
     })
-
 elseif placeId == 17616779267 then
     TeleportTab:CreateSection("In-game")
-
     -- REJOIN = FORCED FRESH SERVER (exactly your working method)
     TeleportTab:CreateButton({
         Name = "Rejoin (New Server)",
@@ -133,26 +197,23 @@ elseif placeId == 17616779267 then
                 Duration = 5,
                 Image = "refresh-cw"
             })
-
             local PlaceId = game.PlaceId
-
             player:Kick("\nRejoining to fresh server...")
             task.wait(1)
-            TeleportService:Teleport(PlaceId)  -- No JobId = Roblox gives you a brand new server
+            TeleportService:Teleport(PlaceId) -- No JobId = Roblox gives you a brand new server
         end,
     })
-
     TeleportTab:CreateDropdown({
         Name = "Dungeons",
         Options = dungeonOptions,
         CurrentOption = dungeonOptions[1] and {dungeonOptions[1]} or {},
         MultipleOptions = false,
+        Flag = "DungeonsDropdown",
         Callback = function(Options)
             local display = Options[1] or ""
             selectedDungeon = display:gsub(" %(Might not work%)", "")
         end,
     })
-
     TeleportTab:CreateSlider({
         Name = "Player Count",
         Range = {1, 4},
@@ -163,17 +224,16 @@ elseif placeId == 17616779267 then
             playerCount = Value
         end,
     })
-
     TeleportTab:CreateDropdown({
         Name = "Modifiers (Warning: Doesn't work for every dungeon)",
         Options = modifierOptions,
         CurrentOption = {},
         MultipleOptions = true,
+        Flag = "ModifiersDropdown",
         Callback = function(Options)
             selectedModifiers = Options
         end,
     })
-
     TeleportTab:CreateButton({
         Name = "Set Dungeon",
         Callback = function()
@@ -185,7 +245,6 @@ elseif placeId == 17616779267 then
             Rayfield:Notify({Title = "Dungeon Set", Content = "Sent: " .. selectedDungeon .. " (" .. playerCount .. " players)", Duration = 5, Image = "play"})
         end,
     })
-
 else
     TeleportTab:CreateSection("Teleport Tools")
     TeleportTab:CreateParagraph({Title = "Place Not Supported", Content = "Only works on PlaceId 17387762301 (lobby) or 17616779267 (in-game)."})
@@ -195,23 +254,19 @@ end
 -- SPELLS TAB
 -- =============================================
 SpellsTab:CreateSection("Casting Improvements")
-
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if not ForceCastEnabled or gameProcessed then return end
     local slot = slotMap[input.KeyCode]
     if not slot then return end
-
     local spellObj
     pcall(function()
         local InventoryModule = require(ReplicatedStorage.Modules.Inventory)
         spellObj = InventoryModule.GetEqSpell(player, slot)
     end)
-
     if spellObj then
         UseSpellRemote:FireServer(spellObj)
     end
 end)
-
 SpellsTab:CreateToggle({
     Name = "Force Spell Cast (Soul Bypass)",
     CurrentValue = false,
@@ -239,8 +294,7 @@ ConfigTab:CreateToggle({
         if Value then
             pcall(function()
                 queueFunction([[
-                    loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-                    -- Paste your FULL SpellForge Hub script here
+                    loadstring(game:HttpGet('https://raw.githubusercontent.com/MikeGames573/MySCPTs/refs/heads/main/UDGB.lua'))()
                 ]])
             end)
             Rayfield:Notify({Title = "Queued!", Content = "Script will auto-run after any teleport.", Duration = 6, Image = "refresh-cw"})
@@ -248,4 +302,49 @@ ConfigTab:CreateToggle({
     end,
 })
 
+-- Themes Dropdown (in Config tab as requested)
+ConfigTab:CreateSection("Themes")
+local ThemesDropdown = ConfigTab:CreateDropdown({
+    Name = "UI Theme",
+    Options = {"Determination", "HATE"},
+    CurrentOption = {"Determination"},
+    MultipleOptions = false,
+    Flag = "SelectedTheme",
+    Callback = function(Options)
+        local selected = Options[1]
+        if selected == "Determination" then
+            Window:ModifyTheme(DeterminationTheme)
+            Rayfield:Notify({Title = "Theme Changed", Content = "Determination theme applied (red variations).", Duration = 4, Image = "palette"})
+        elseif selected == "HATE" then
+            Window:ModifyTheme(HATETheme)
+            Rayfield:Notify({Title = "Theme Changed", Content = "HATE theme applied (purple variations).", Duration = 4, Image = "palette"})
+        end
+    end,
+})
+
 Rayfield:LoadConfiguration()
+
+-- =============================================
+-- POST-LOAD FIXES
+-- =============================================
+-- Re-apply saved theme (dropdown doesn't auto-apply on config load)
+if Rayfield.Flags.SelectedTheme then
+    local savedTheme = Rayfield.Flags.SelectedTheme[1]
+    if savedTheme == "Determination" then
+        Window:ModifyTheme(DeterminationTheme)
+    elseif savedTheme == "HATE" then
+        Window:ModifyTheme(HATETheme)
+    end
+end
+
+-- Make "Auto Execute on Teleport" PERSISTENT across EVERY teleport (the main fix you asked for)
+-- Now it will ALWAYS re-queue itself every time the script runs (manual or auto) if the toggle is ON.
+-- This works even after place changes/teleports and respects the saved config value.
+if Rayfield.Flags.AutoExecuteTeleport then
+    pcall(function()
+        queueFunction([[
+            loadstring(game:HttpGet('https://raw.githubusercontent.com/MikeGames573/MySCPTs/refs/heads/main/UDGB.lua'))()
+        ]])
+    end)
+    -- No notification here (prevents spam on every auto-run)
+end
