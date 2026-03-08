@@ -1,80 +1,94 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 -- =============================================
--- CUSTOM THEMES (super easy to extend!)
--- Just add a new entry to the Themes table below.
--- Custom themes = full table, built-in themes = string name.
+-- CUSTOM THEMES (super easy to expand!)
 -- =============================================
-local BaseTheme = {
+-- To add a new theme:
+-- 1. Create a new table like DeterminationTheme or HateTheme below
+-- 2. Add it to ThemeMap with the exact name you want in the dropdown
+-- 3. Add the name to the dropdown Options list in the Config tab
+-- Everything uses full Rayfield theme tables → changes **ALL** colors (buttons, toggles, sliders, tabs, background, text, notifications, etc.)
+
+local DeterminationTheme = {
     TextColor = Color3.fromRGB(240, 240, 240),
-    Background = Color3.fromRGB(25, 25, 25),
-    Topbar = Color3.fromRGB(34, 34, 34),
-    Shadow = Color3.fromRGB(20, 20, 20),
-    NotificationBackground = Color3.fromRGB(20, 20, 20),
-    NotificationActionsBackground = Color3.fromRGB(230, 230, 230),
-    TabBackground = Color3.fromRGB(80, 80, 80),
-    TabStroke = Color3.fromRGB(85, 85, 85),
-    TabBackgroundSelected = Color3.fromRGB(210, 210, 210),
+    Background = Color3.fromRGB(18, 18, 18),
+    Topbar = Color3.fromRGB(28, 28, 28),
+    Shadow = Color3.fromRGB(10, 10, 10),
+    NotificationBackground = Color3.fromRGB(22, 22, 22),
+    NotificationActionsBackground = Color3.fromRGB(35, 35, 35),
+    TabBackground = Color3.fromRGB(28, 28, 28),
+    TabStroke = Color3.fromRGB(80, 0, 0),
+    TabBackgroundSelected = Color3.fromRGB(55, 10, 10),
     TabTextColor = Color3.fromRGB(240, 240, 240),
-    SelectedTabTextColor = Color3.fromRGB(50, 50, 50),
-    ElementBackground = Color3.fromRGB(35, 35, 35),
-    ElementBackgroundHover = Color3.fromRGB(40, 40, 40),
-    SecondaryElementBackground = Color3.fromRGB(25, 25, 25),
-    ElementStroke = Color3.fromRGB(50, 50, 50),
-    SecondaryElementStroke = Color3.fromRGB(40, 40, 40),
-            
-    SliderBackground = Color3.fromRGB(50, 138, 220),
-    SliderProgress = Color3.fromRGB(50, 138, 220),
-    SliderStroke = Color3.fromRGB(58, 163, 255),
+    SelectedTabTextColor = Color3.fromRGB(255, 90, 90),
+    ElementBackground = Color3.fromRGB(28, 28, 28),
+    ElementBackgroundHover = Color3.fromRGB(40, 20, 20),
+    SecondaryElementBackground = Color3.fromRGB(20, 20, 20),
+    ElementStroke = Color3.fromRGB(70, 0, 0),
+    SecondaryElementStroke = Color3.fromRGB(50, 0, 0),
+    SliderBackground = Color3.fromRGB(45, 0, 0),
+    SliderProgress = Color3.fromRGB(190, 40, 40),   -- bright, vibrant red (not dark!)
+    SliderStroke = Color3.fromRGB(210, 60, 60),
     ToggleBackground = Color3.fromRGB(30, 30, 30),
-    ToggleEnabled = Color3.fromRGB(0, 146, 214),
-    ToggleDisabled = Color3.fromRGB(100, 100, 100),
-    ToggleEnabledStroke = Color3.fromRGB(0, 170, 255),
-    ToggleDisabledStroke = Color3.fromRGB(125, 125, 125),
-    ToggleEnabledOuterStroke = Color3.fromRGB(100, 100, 100),
-    ToggleDisabledOuterStroke = Color3.fromRGB(65, 65, 65),
-    DropdownSelected = Color3.fromRGB(40, 40, 40),
-    DropdownUnselected = Color3.fromRGB(30, 30, 30),
-    InputBackground = Color3.fromRGB(30, 30, 30),
-    InputStroke = Color3.fromRGB(65, 65, 65),
-    PlaceholderColor = Color3.fromRGB(178, 178, 178)
+    ToggleEnabled = Color3.fromRGB(170, 20, 20),
+    ToggleDisabled = Color3.fromRGB(90, 90, 90),
+    ToggleEnabledStroke = Color3.fromRGB(200, 50, 50),
+    ToggleDisabledStroke = Color3.fromRGB(110, 110, 110),
+    ToggleEnabledOuterStroke = Color3.fromRGB(150, 0, 0),
+    ToggleDisabledOuterStroke = Color3.fromRGB(70, 70, 70),
+    DropdownSelected = Color3.fromRGB(45, 15, 15),
+    DropdownUnselected = Color3.fromRGB(28, 28, 28),
+    InputBackground = Color3.fromRGB(28, 28, 28),
+    InputStroke = Color3.fromRGB(70, 0, 0),
+    PlaceholderColor = Color3.fromRGB(170, 170, 170)
 }
 
-local DeterminationTheme = table.clone(BaseTheme)
-DeterminationTheme.SliderBackground = Color3.fromRGB(150, 0, 0)
-DeterminationTheme.SliderProgress = Color3.fromRGB(150, 0, 0)
-DeterminationTheme.SliderStroke = Color3.fromRGB(200, 50, 50)
-DeterminationTheme.ToggleEnabled = Color3.fromRGB(150, 0, 0)
-DeterminationTheme.ToggleEnabledStroke = Color3.fromRGB(200, 50, 50)
+local HateTheme = {
+    TextColor = Color3.fromRGB(235, 235, 235),
+    Background = Color3.fromRGB(10, 0, 18),
+    Topbar = Color3.fromRGB(15, 0, 25),
+    Shadow = Color3.fromRGB(5, 0, 10),
+    NotificationBackground = Color3.fromRGB(12, 0, 22),
+    NotificationActionsBackground = Color3.fromRGB(18, 0, 28),
+    TabBackground = Color3.fromRGB(15, 0, 25),
+    TabStroke = Color3.fromRGB(40, 0, 55),
+    TabBackgroundSelected = Color3.fromRGB(30, 0, 40),
+    TabTextColor = Color3.fromRGB(235, 235, 235),
+    SelectedTabTextColor = Color3.fromRGB(180, 80, 220),
+    ElementBackground = Color3.fromRGB(15, 0, 25),
+    ElementBackgroundHover = Color3.fromRGB(22, 0, 35),
+    SecondaryElementBackground = Color3.fromRGB(10, 0, 18),
+    ElementStroke = Color3.fromRGB(45, 0, 60),
+    SecondaryElementStroke = Color3.fromRGB(35, 0, 48),
+    SliderBackground = Color3.fromRGB(20, 0, 32),
+    SliderProgress = Color3.fromRGB(90, 10, 140),
+    SliderStroke = Color3.fromRGB(110, 20, 160),
+    ToggleBackground = Color3.fromRGB(18, 0, 28),
+    ToggleEnabled = Color3.fromRGB(75, 0, 115),
+    ToggleDisabled = Color3.fromRGB(75, 75, 75),
+    ToggleEnabledStroke = Color3.fromRGB(100, 0, 150),
+    ToggleDisabledStroke = Color3.fromRGB(95, 95, 95),
+    ToggleEnabledOuterStroke = Color3.fromRGB(17, 0, 31),
+    ToggleDisabledOuterStroke = Color3.fromRGB(55, 55, 55),
+    DropdownSelected = Color3.fromRGB(25, 0, 38),
+    DropdownUnselected = Color3.fromRGB(15, 0, 25),
+    InputBackground = Color3.fromRGB(15, 0, 25),
+    InputStroke = Color3.fromRGB(45, 0, 60),
+    PlaceholderColor = Color3.fromRGB(160, 160, 160)
+}
 
-local HATETheme = table.clone(BaseTheme)
-HATETheme.SliderBackground = Color3.fromRGB(90, 0, 140)
-HATETheme.SliderProgress = Color3.fromRGB(90, 0, 140)
-HATETheme.SliderStroke = Color3.fromRGB(130, 30, 180)
-HATETheme.ToggleEnabled = Color3.fromRGB(90, 0, 140)
-HATETheme.ToggleEnabledStroke = Color3.fromRGB(130, 30, 180)
-
-local Themes = {
+local ThemeMap = {
     Determination = DeterminationTheme,
-    HATE = HATETheme,
-    Default = "Default",
-    AmberGlow = "AmberGlow",
-    Amethyst = "Amethyst",
-    Bloom = "Bloom",
-    DarkBlue = "DarkBlue",
-    Green = "Green",
-    Light = "Light",
-    Ocean = "Ocean",
-    Serenity = "Serenity",
+    HATE = HateTheme,
+    Default = "Default"
 }
 
--- Create window with Determination as DEFAULT theme
 local Window = Rayfield:CreateWindow({
     Name = "SpellForge Hub",
     Icon = 0,
     LoadingTitle = "SpellForge Hub",
     LoadingSubtitle = "Advanced Spell Tools",
-    Theme = Themes.Determination, -- Determination is now the default
+    Theme = DeterminationTheme, -- Default theme (Determination)
     ConfigurationSaving = {
         Enabled = true,
         FolderName = "SpellForge",
@@ -134,6 +148,9 @@ if artifactsFolder then
         end
     end
 end
+
+-- Queue function (used for auto-execute persistence)
+local queueFunction = queue_on_teleport or (syn and syn.queue_on_teleport) or function() end
 
 -- =============================================
 -- TELEPORT TAB (Lobby or In-game)
@@ -272,11 +289,9 @@ SpellsTab:CreateToggle({
 })
 
 -- =============================================
--- CONFIG TAB
+-- CONFIG TAB (clean & organized)
 -- =============================================
 ConfigTab:CreateSection("Script Settings")
-
-local queueFunction = queue_on_teleport or (syn and syn.queue_on_teleport) or function() end
 
 local AutoExecuteToggle = ConfigTab:CreateToggle({
     Name = "Auto Execute on Teleport",
@@ -296,27 +311,21 @@ local AutoExecuteToggle = ConfigTab:CreateToggle({
 
 ConfigTab:CreateSection("Appearance")
 
--- Dynamic theme list (add more in the Themes table above and it auto-appears here)
-local themeOptions = {}
-for themeName in pairs(Themes) do
-    table.insert(themeOptions, themeName)
-end
-table.sort(themeOptions)
-
 local ThemeDropdown = ConfigTab:CreateDropdown({
-    Name = "UI Theme",
-    Options = themeOptions,
+    Name = "Theme",
+    Options = {"Determination", "HATE", "Default"},
     CurrentOption = {"Determination"},
     MultipleOptions = false,
     Flag = "SelectedTheme",
     Callback = function(Options)
-        local selected = Options[1]
-        if Themes[selected] then
-            Window:ModifyTheme(Themes[selected])
+        local themeName = Options[1] or "Determination"
+        local themeValue = ThemeMap[themeName]
+        if themeValue then
+            Window:ModifyTheme(themeValue)
             Rayfield:Notify({
-                Title = "Theme Changed",
-                Content = "Switched to " .. selected .. " (beautifully organized & clean)",
-                Duration = 3,
+                Title = "Theme Updated",
+                Content = "Switched to " .. themeName .. " (full UI refresh)",
+                Duration = 4,
                 Image = "palette"
             })
         end
@@ -324,18 +333,20 @@ local ThemeDropdown = ConfigTab:CreateDropdown({
 })
 
 -- =============================================
--- FINAL CONFIG LOADING + AUTO-EXECUTE FIX
+-- LOAD CONFIG + APPLY PERSISTENT SETTINGS
 -- =============================================
 Rayfield:LoadConfiguration()
 
--- Apply saved theme after config loads (so it persists across teleports)
-local savedThemeName = ThemeDropdown.CurrentOption and ThemeDropdown.CurrentOption[1] or "Determination"
-if Themes[savedThemeName] then
-    Window:ModifyTheme(Themes[savedThemeName])
+-- Apply saved theme (works even after teleport / re-execute)
+if ThemeDropdown.CurrentOption and #ThemeDropdown.CurrentOption > 0 then
+    local savedThemeName = ThemeDropdown.CurrentOption[1]
+    local savedTheme = ThemeMap[savedThemeName]
+    if savedTheme then
+        Window:ModifyTheme(savedTheme)
+    end
 end
 
--- Auto Execute now ALWAYS works when toggled on
--- (even after teleport — the toggle state is saved and re-queues instantly)
+-- Auto Execute now persists correctly (queues every time the script runs IF toggled ON)
 if AutoExecuteToggle.CurrentValue then
     pcall(function()
         queueFunction([[
