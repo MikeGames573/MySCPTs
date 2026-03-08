@@ -12,14 +12,13 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
-    Name = "SpellForge Hub v1.4.2",
+    Name = "Undertale Dungeons Go Beyond v1.4.2",
     Icon = 0,
-    LoadingTitle = "SpellForge Hub",
-    LoadingSubtitle = "Advanced Spell Tools",
+    LoadingTitle = "Assisting tools for the newest version of Undertale Dungeons",
+    LoadingSubtitle = "Made by Heli",
     ConfigurationSaving = {
         Enabled = true,
-        FolderName = "SpellForge",
-        FileName = "SpellSettings"
+        FileName = "UDGB"
     },
     ToggleUIKeybind = "K"
 })
@@ -30,7 +29,7 @@ Rayfield:Notify({
    Duration = 6.5
 })
 
-local TeleportTab = Window:CreateTab("Teleport", "home")
+local TeleportTab = Window:CreateTab("Main", "home")
 local SpellsTab = Window:CreateTab("Spells", "sparkles")
 local ConfigTab = Window:CreateTab("Config", "settings")
 -- =============================================
@@ -82,7 +81,24 @@ end
 -- =============================================
 local placeId = game.PlaceId
 if placeId == 17387762301 then
-    TeleportTab:CreateSection("Lobby")
+    TeleportTab:CreateSection("(Dungeon Starter) Lobby")
+    TeleportTab:CreateSection("(Dungeon Starter) In-game")
+    -- REJOIN = FORCED FRESH SERVER (exactly your working method)
+    TeleportTab:CreateButton({
+        Name = "Rejoin (New Server)",
+        Callback = function()
+            Rayfield:Notify({
+                Title = "Joining Fresh Server",
+                Content = "Forcing a completely new server (this bypasses started dungeon kick)...",
+                Duration = 5,
+                Image = "refresh-cw"
+            })
+            local PlaceId = game.PlaceId
+            player:Kick("\nRejoining to fresh server...")
+            task.wait(1)
+            TeleportService:Teleport(PlaceId) -- No JobId = Roblox gives you a brand new server
+        end,
+    })
     TeleportTab:CreateDropdown({
         Name = "Dungeons",
         Options = dungeonOptions,
