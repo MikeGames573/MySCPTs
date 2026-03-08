@@ -12,9 +12,9 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
-    Name = "Undertale Dungeons Go Beyond v1.5.1",
+    Name = "Undertale Dungeons Go Beyond v1.5.2",
     Icon = 0,
-    LoadingTitle = "Undertale Dungeons Go Beyond v1.5.1",
+    LoadingTitle = "Undertale Dungeons Go Beyond v1.5.2",
     LoadingSubtitle = "Made by Heli",
     ConfigurationSaving = {
         Enabled = true,
@@ -97,6 +97,7 @@ SpellsTab:CreateDropdown({
 	Options = trinketOptions,
 	CurrentOption = {},
 	MultipleOptions = true,
+	Flag = "SelectedTrinkets",
 	Callback = function(Options)
 		selectedTrinkets = Options
 	end,
