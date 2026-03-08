@@ -12,9 +12,9 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local Window = Rayfield:CreateWindow({
-    Name = "Undertale Dungeons Go Beyond v1.4.3",
+    Name = "Undertale Dungeons Go Beyond v1.4.4",
     Icon = 0,
-    LoadingTitle = "Undertale Dungeons Go Beyond v1.4.3",
+    LoadingTitle = "Undertale Dungeons Go Beyond v1.4.4",
     LoadingSubtitle = "Made by Heli",
     ConfigurationSaving = {
         Enabled = true,
