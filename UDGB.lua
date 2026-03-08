@@ -79,7 +79,7 @@ local Themes = {
 local themeList = {"Determination", "HATE"} -- Add new theme name here to show in dropdown (order matters)
 
 local Window = Rayfield:CreateWindow({
-    Name = "SpellForge Hub",
+    Name = "SpellForge Hub v1.4",
     Icon = 0,
     LoadingTitle = "SpellForge Hub",
     LoadingSubtitle = "Advanced Spell Tools",
