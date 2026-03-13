@@ -12,9 +12,9 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/MikeGames573/MySCPTs/refs/heads/main/RF%20(No%20blotware%20edition).lua'))()
 local Window = Rayfield:CreateWindow({
-    Name = "Undertale Dungeons Go Beyond v1.6.1",
+    Name = "Undertale Dungeons Go Beyond v1.6.1b",
     Icon = 0,
-    LoadingTitle = "Undertale Dungeons Go Beyond v1.6.1",
+    LoadingTitle = "Undertale Dungeons Go Beyond v1.6.1b",
     LoadingSubtitle = "Made by Heli",
     ConfigurationSaving = {
         Enabled = true,
@@ -61,34 +61,45 @@ pcall(function()
 	end
 end)
 
-local oldNamecall
-oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
+local inHook = false
+local mt = getrawmetatable(game)
+local oldNamecall = mt.__namecall
+setreadonly(mt, false)
+
+mt.__namecall = newcclosure(function(self, ...)
+	if inHook then
+		return oldNamecall(self, ...)
+	end
+
 	if not LowCooldownEnabled then
 		return oldNamecall(self, ...)
 	end
 
 	local method = getnamecallmethod()
 	if self == UseSpellRemote and method == "FireServer" then
-		-- ANTES do UseSpell
+		inHook = true
+
 		pcall(function()
 			ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Patience"), 1)
 			ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Patience"), 2)
 		end)
 
-		-- Deixa o cast acontecer normalmente
 		local result = oldNamecall(self, ...)
 
-		-- DEPOIS do UseSpell
 		pcall(function()
 			ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Determination"), 1)
 			ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Hate"), 2)
 		end)
 
+		inHook = false
 		return result
 	end
 
+	inHook = false
 	return oldNamecall(self, ...)
 end)
+
+setreadonly(mt, true)
 
 -- Shared variables
 local selectedDungeon = ""
