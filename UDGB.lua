@@ -364,7 +364,7 @@ ConfigTab:CreateButton({
 		Rayfield:Destroy() -- This completely erases the entire Rayfield UI, all tabs, sections, toggles, connections, and memory traces
 	end,
 })
-
+Rayfield:LoadConfiguration()
 local oldNamecall
 oldNamecall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
     if not LowCooldownEnabled then
@@ -394,5 +394,3 @@ oldNamecall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
 
     return oldNamecall(self, ...)
 end))
-
-Rayfield:LoadConfiguration()
