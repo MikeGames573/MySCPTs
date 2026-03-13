@@ -12,9 +12,9 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/MikeGames573/MySCPTs/refs/heads/main/RF%20(No%20blotware%20edition).lua'))()
 local Window = Rayfield:CreateWindow({
-    Name = "Undertale Dungeons Go Beyond v1.6.1f",
+    Name = "Undertale Dungeons Go Beyond v1.6.1g",
     Icon = 0,
-    LoadingTitle = "Undertale Dungeons Go Beyond v1.6.1f",
+    LoadingTitle = "Undertale Dungeons Go Beyond v1.6.1g",
     LoadingSubtitle = "Made by Heli",
     ConfigurationSaving = {
         Enabled = true,
@@ -51,28 +51,33 @@ local Determination = SoulsFolder:WaitForChild("Determination")
 local Hate = SoulsFolder:WaitForChild("Hate")
 local ChangeSoul = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ChangeSoul")
 
-local oldNamecall
-oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
-    local method = getnamecallmethod()
-    
-    if method == "FireServer" and self == UseSpellRemote and LowCooldownEnabled then
-        -- ANTES do UseSpell (muda as duas partes da alma para Patience)
+local oldFireServer = UseSpellRemote.FireServer
+UseSpellRemote.FireServer = function(self, ...)
+    if self ~= UseSpellRemote or not LowCooldownEnabled then
+        return oldFireServer(self, ...)
+    end
+
+    -- ANTES do UseSpell
+    pcall(function()
         ChangeSoul:InvokeServer(Patience, 1)
         ChangeSoul:InvokeServer(Patience, 2)
-        
-        -- Executa o cast original
-        local args = {...}
-        local results = {oldNamecall(self, unpack(args))}
-        
-        -- DEPOIS do UseSpell ter fired (muda para DT e Hate)
+    end)
+
+    -- Executa o cast original
+    local success, result = pcall(function(...)
+        return {oldFireServer(self, ...)}
+    end, ...)
+
+    -- DEPOIS do UseSpell (sempre executa)
+    pcall(function()
         ChangeSoul:InvokeServer(Determination, 1)
         ChangeSoul:InvokeServer(Hate, 2)
-        
-        return unpack(results)
+    end)
+
+    if success then
+        return unpack(result)
     end
-    
-    return oldNamecall(self, ...)
-end)
+end
 
 local selectedTrinkets = {}
 local trinketSpamConnection = nil
