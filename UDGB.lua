@@ -12,9 +12,9 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/MikeGames573/MySCPTs/refs/heads/main/RF%20(No%20blotware%20edition).lua'))()
 local Window = Rayfield:CreateWindow({
-    Name = "Undertale Dungeons Go Beyond v1.5.2",
+    Name = "Undertale Dungeons Go Beyond v1.6",
     Icon = 0,
-    LoadingTitle = "Undertale Dungeons Go Beyond v1.5.2",
+    LoadingTitle = "Undertale Dungeons Go Beyond v1.6",
     LoadingSubtitle = "Made by Heli",
     ConfigurationSaving = {
         Enabled = true,
@@ -45,11 +45,8 @@ local slotMap = {
 }
 
 local Remotes = ReplicatedStorage:WaitForChild("Remotes")
-local Souls = ReplicatedStorage:WaitForChild("Souls")
-local Patience = Souls:WaitForChild("Patience")
-local Determination = Souls:WaitForChild("Determination")
-local Hate = Souls:WaitForChild("Hate")
-local ChangeSoul = Remotes:WaitForChild("ChangeSoul")
+local ChangeSoulRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ChangeSoul")
+local SoulsFolder = ReplicatedStorage:WaitForChild("Souls")
 
 local selectedTrinkets = {}
 local trinketSpamConnection = nil
@@ -276,19 +273,65 @@ end
 -- SPELLS TAB
 -- =============================================
 SpellsTab:CreateSection("Spell Modifiers")
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if not ForceCastEnabled or gameProcessed then return end
-    local slot = slotMap[input.KeyCode]
-    if not slot then return end
-    local spellObj
-    pcall(function()
-        local InventoryModule = require(ReplicatedStorage.Modules.Inventory)
-        spellObj = InventoryModule.GetEqSpell(player, slot)
-    end)
-    if spellObj then
-        UseSpellRemote:FireServer(spellObj)
-    end
-end)
+
+local ContextActionService = game:GetService("ContextActionService")
+
+local function HandleSpellCast(actionName, inputState, inputObject)
+	if inputState ~= Enum.UserInputState.Begin then
+		return Enum.ContextActionResult.Pass
+	end
+	
+	local slot = slotMap[inputObject.KeyCode]
+	if not slot then
+		return Enum.ContextActionResult.Pass
+	end
+	
+	-- Pega a spell equipada
+	local spellObj
+	pcall(function()
+		local InventoryModule = require(ReplicatedStorage.Modules.Inventory)
+		spellObj = InventoryModule.GetEqSpell(player, slot)
+	end)
+	
+	if not spellObj then
+		return Enum.ContextActionResult.Pass
+	end
+	
+	-- ==================== LÓGICA DOS TOGGLES ====================
+	if ForceCastLowerCooldownEnabled then
+		-- === ANTES DO CAST (lower cooldown) ===
+		ChangeSoulRemote:InvokeServer(SoulsFolder.Patience, 1)
+		ChangeSoulRemote:InvokeServer(SoulsFolder.Patience, 2)
+		
+		-- === CAST ===
+		UseSpellRemote:FireServer(spellObj)
+		task.wait(0.05)
+		-- === DEPOIS DO CAST ===
+		ChangeSoulRemote:InvokeServer(SoulsFolder.Determination, 1)
+		ChangeSoulRemote:InvokeServer(SoulsFolder.Hate, 2)
+		
+		return Enum.ContextActionResult.Sink
+		
+	elseif ForceCastEnabled then
+		-- === CAST NORMAL (só bypass) ===
+		UseSpellRemote:FireServer(spellObj)
+		return Enum.ContextActionResult.Sink
+	end
+	
+	-- Nenhum toggle ativo → deixa o jogo usar normalmente
+	return Enum.ContextActionResult.Pass
+end
+
+-- Bind permanente das teclas (só 1 vez)
+ContextActionService:BindAction(
+	"ForceSpellCastOverride",
+	HandleSpellCast,
+	false,
+	Enum.KeyCode.One, Enum.KeyCode.Q,
+	Enum.KeyCode.Two, Enum.KeyCode.E,
+	Enum.KeyCode.Three, Enum.KeyCode.R,
+	Enum.KeyCode.Four, Enum.KeyCode.F
+)
 SpellsTab:CreateToggle({
     Name = "Force Spell Cast (Soul Bypass)",
     CurrentValue = false,
@@ -299,6 +342,18 @@ SpellsTab:CreateToggle({
             Rayfield:Notify({Title = "Force Spell Cast", Content = "Soul requirements bypassed.\nUse 1/Q • 2/E • 3/R • 4/F", Duration = 5, Image = "zap"})
         end
     end,
+})
+
+SpellsTab:CreateToggle({
+	Name = "Force Spell Cast (Soul bypass, lower cooldown)",
+	CurrentValue = false,
+	Flag = "ForceSpellCastLowerCD",
+	Callback = function(Value)
+		ForceCastLowerCooldownEnabled = Value
+		if Value then
+				Rayfield:Notify({Title = "Force Spell Cast", Content = "Soul requirements bypassed and cooldown lowered.\nUse 1/Q • 2/E • 3/R • 4/F", Duration = 5, Image = "zap"})
+		end
+	end,
 })
 -- =============================================
 -- CONFIG TAB
