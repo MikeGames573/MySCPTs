@@ -12,9 +12,9 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/MikeGames573/MySCPTs/refs/heads/main/RF%20(No%20blotware%20edition).lua'))()
 local Window = Rayfield:CreateWindow({
-    Name = "Undertale Dungeons Go Beyond v1.6.1b",
+    Name = "Undertale Dungeons Go Beyond v1.6.1c",
     Icon = 0,
-    LoadingTitle = "Undertale Dungeons Go Beyond v1.6.1b",
+    LoadingTitle = "Undertale Dungeons Go Beyond v1.6.1c",
     LoadingSubtitle = "Made by Heli",
     ConfigurationSaving = {
         Enabled = true,
@@ -38,8 +38,12 @@ local player = Players.LocalPlayer
 local UseSpellRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("UseSpell")
 local ChangeSoulRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ChangeSoul")
 local SoulsFolder = ReplicatedStorage:WaitForChild("Souls")
+local PatienceSoul = SoulsFolder:WaitForChild("Patience")
+local DeterminationSoul = SoulsFolder:WaitForChild("Determination")
+local HateSoul = SoulsFolder:WaitForChild("Hate")
 local ForceCastEnabled = false
 local LowCooldownEnabled = false
+local debugShown = true
 local slotMap = {
     [Enum.KeyCode.One] = 1, [Enum.KeyCode.Q] = 1,
     [Enum.KeyCode.Two] = 2, [Enum.KeyCode.E] = 2,
@@ -61,45 +65,40 @@ pcall(function()
 	end
 end)
 
-local inHook = false
-local mt = getrawmetatable(game)
-local oldNamecall = mt.__namecall
-setreadonly(mt, false)
-
-mt.__namecall = newcclosure(function(self, ...)
-	if inHook then
-		return oldNamecall(self, ...)
+-- Stable hook using hookfunction (this is the method that works on almost every executor without crashing or breaking FireServer)
+local oldFireServer = hookfunction(UseSpellRemote.FireServer, function(self, ...)
+	if not LowCooldownEnabled or self ~= UseSpellRemote then
+		return oldFireServer(self, ...)
 	end
 
-	if not LowCooldownEnabled then
-		return oldNamecall(self, ...)
+	-- BEFORE the spell fires (Patience on both souls)
+	pcall(function()
+		ChangeSoulRemote:InvokeServer(PatienceSoul, 1)
+		ChangeSoulRemote:InvokeServer(PatienceSoul, 2)
+	end)
+
+	-- Let the original spell happen normally
+	local result = oldFireServer(self, ...)
+
+	-- AFTER the spell has fired (Determination on slot 1 + Hate on slot 2)
+	pcall(function()
+		ChangeSoulRemote:InvokeServer(DeterminationSoul, 1)
+		ChangeSoulRemote:InvokeServer(HateSoul, 2)
+	end)
+
+	-- Show debug notification only the FIRST time a spell is cast after enabling (so you know the hook is working)
+	if not debugShown then
+		debugShown = true
+		Rayfield:Notify({
+			Title = "Low Cooldown Hook",
+			Content = "Hook triggered successfully!\nSoul swap should now be active.",
+			Duration = 5,
+			Image = "zap"
+		})
 	end
 
-	local method = getnamecallmethod()
-	if self == UseSpellRemote and method == "FireServer" then
-		inHook = true
-
-		pcall(function()
-			ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Patience"), 1)
-			ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Patience"), 2)
-		end)
-
-		local result = oldNamecall(self, ...)
-
-		pcall(function()
-			ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Determination"), 1)
-			ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Hate"), 2)
-		end)
-
-		inHook = false
-		return result
-	end
-
-	inHook = false
-	return oldNamecall(self, ...)
+	return result
 end)
-
-setreadonly(mt, true)
 
 -- Shared variables
 local selectedDungeon = ""
