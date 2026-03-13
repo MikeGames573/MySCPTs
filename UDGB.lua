@@ -12,9 +12,9 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/MikeGames573/MySCPTs/refs/heads/main/RF%20(No%20blotware%20edition).lua'))()
 local Window = Rayfield:CreateWindow({
-    Name = "Undertale Dungeons Go Beyond v1.6.0",
+    Name = "Undertale Dungeons Go Beyond v1.6.1",
     Icon = 0,
-    LoadingTitle = "Undertale Dungeons Go Beyond v1.6.0",
+    LoadingTitle = "Undertale Dungeons Go Beyond v1.6.1",
     LoadingSubtitle = "Made by Heli",
     ConfigurationSaving = {
         Enabled = true,
@@ -61,29 +61,34 @@ pcall(function()
 	end
 end)
 
-local oldSpellRemote = UseSpellRemote.FireServer
-UseSpellRemote.FireServer = function(self, ...)
+local oldNamecall
+oldNamecall = hookmetamethod(game, "__namecall", function(self, ...)
 	if not LowCooldownEnabled then
-		return oldSpellRemote(self, ...)
+		return oldNamecall(self, ...)
 	end
 
-	-- ANTES do UseSpell acontecer
-	pcall(function()
-		ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Patience"), 1)
-		ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Patience"), 2)
-	end)
+	local method = getnamecallmethod()
+	if self == UseSpellRemote and method == "FireServer" then
+		-- ANTES do UseSpell
+		pcall(function()
+			ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Patience"), 1)
+			ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Patience"), 2)
+		end)
 
-	-- Deixa o UseSpell acontecer normalmente
-	local result = oldSpellRemote(self, ...)
+		-- Deixa o cast acontecer normalmente
+		local result = oldNamecall(self, ...)
 
-	-- DEPOIS do UseSpell já ter fired
-	pcall(function()
-		ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Determination"), 1)
-		ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Hate"), 2)
-	end)
+		-- DEPOIS do UseSpell
+		pcall(function()
+			ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Determination"), 1)
+			ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Hate"), 2)
+		end)
 
-	return result
-end
+		return result
+	end
+
+	return oldNamecall(self, ...)
+end)
 
 -- Shared variables
 local selectedDungeon = ""
