@@ -12,9 +12,9 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/MikeGames573/MySCPTs/refs/heads/main/RF%20(No%20blotware%20edition).lua'))()
 local Window = Rayfield:CreateWindow({
-    Name = "Undertale Dungeons Go Beyond v1.5.2",
+    Name = "Undertale Dungeons Go Beyond v1.6.0",
     Icon = 0,
-    LoadingTitle = "Undertale Dungeons Go Beyond v1.5.2",
+    LoadingTitle = "Undertale Dungeons Go Beyond v1.6.0",
     LoadingSubtitle = "Made by Heli",
     ConfigurationSaving = {
         Enabled = true,
@@ -36,7 +36,10 @@ local TeleportService = game:GetService("TeleportService")
 local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local UseSpellRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("UseSpell")
+local ChangeSoulRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ChangeSoul")
+local SoulsFolder = ReplicatedStorage:WaitForChild("Souls")
 local ForceCastEnabled = false
+local LowCooldownEnabled = false
 local slotMap = {
     [Enum.KeyCode.One] = 1, [Enum.KeyCode.Q] = 1,
     [Enum.KeyCode.Two] = 2, [Enum.KeyCode.E] = 2,
@@ -57,6 +60,30 @@ pcall(function()
 		end
 	end
 end)
+
+local oldSpellRemote = UseSpellRemote.FireServer
+UseSpellRemote.FireServer = function(self, ...)
+	if not LowCooldownEnabled then
+		return oldSpellRemote(self, ...)
+	end
+
+	-- ANTES do UseSpell acontecer
+	pcall(function()
+		ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Patience"), 1)
+		ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Patience"), 2)
+	end)
+
+	-- Deixa o UseSpell acontecer normalmente
+	local result = oldSpellRemote(self, ...)
+
+	-- DEPOIS do UseSpell já ter fired
+	pcall(function()
+		ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Determination"), 1)
+		ChangeSoulRemote:InvokeServer(SoulsFolder:WaitForChild("Hate"), 2)
+	end)
+
+	return result
+end
 
 -- Shared variables
 local selectedDungeon = ""
@@ -268,7 +295,7 @@ end
 -- =============================================
 -- SPELLS TAB
 -- =============================================
-SpellsTab:CreateSection("Casting Improvements")
+SpellsTab:CreateSection("Spell Modifiers")
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if not ForceCastEnabled or gameProcessed then return end
     local slot = slotMap[input.KeyCode]
@@ -292,6 +319,23 @@ SpellsTab:CreateToggle({
             Rayfield:Notify({Title = "Force Spell Cast", Content = "Soul requirements bypassed.\nUse 1/Q • 2/E • 3/R • 4/F", Duration = 5, Image = "zap"})
         end
     end,
+})
+
+SpellsTab:CreateToggle({
+	Name = "Low Cooldown Spells",
+	CurrentValue = false,
+	Flag = "LowCooldownSpell", -- novo flag (salva no config corretamente)
+	Callback = function(Value)
+		LowCooldownEnabled = Value
+		if Value then
+			Rayfield:Notify({
+				Title = "Low Cooldown Spell",
+				Content = "This is a test for lowering the spells cooldown, may not work",
+				Duration = 6,
+				Image = "zap"
+			})
+		end
+	end,
 })
 -- =============================================
 -- CONFIG TAB
