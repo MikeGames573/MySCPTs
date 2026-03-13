@@ -51,34 +51,6 @@ local Determination = SoulsFolder:WaitForChild("Determination")
 local Hate = SoulsFolder:WaitForChild("Hate")
 local ChangeSoul = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ChangeSoul")
 
-local oldFireServer = UseSpellRemote.FireServer
-UseSpellRemote.FireServer = function(self, ...)
-    if self ~= UseSpellRemote or not LowCooldownEnabled then
-        return oldFireServer(self, ...)
-    end
-
-    -- ANTES do UseSpell
-    pcall(function()
-        ChangeSoul:InvokeServer(Patience, 1)
-        ChangeSoul:InvokeServer(Patience, 2)
-    end)
-
-    -- Executa o cast original
-    local success, result = pcall(function(...)
-        return {oldFireServer(self, ...)}
-    end, ...)
-
-    -- DEPOIS do UseSpell (sempre executa)
-    pcall(function()
-        ChangeSoul:InvokeServer(Determination, 1)
-        ChangeSoul:InvokeServer(Hate, 2)
-    end)
-
-    if success then
-        return unpack(result)
-    end
-end
-
 local selectedTrinkets = {}
 local trinketSpamConnection = nil
 local trinketOptions = {}
@@ -328,6 +300,34 @@ SpellsTab:CreateToggle({
         end
     end,
 })
+
+local oldFireServer = UseSpellRemote.FireServer
+UseSpellRemote.FireServer = function(self, ...)
+    if self ~= UseSpellRemote or not LowCooldownEnabled then
+        return oldFireServer(self, ...)
+    end
+
+    -- ANTES do cast (Patience nas duas almas)
+    pcall(function()
+        ChangeSoul:InvokeServer(Patience, 1)
+        ChangeSoul:InvokeServer(Patience, 2)
+    end)
+
+    -- Executa o cast original
+    local success, result = pcall(function(...)
+        return {oldFireServer(self, ...)}
+    end, ...)
+
+    -- DEPOIS do cast (DT + Hate)
+    pcall(function()
+        ChangeSoul:InvokeServer(Determination, 1)
+        ChangeSoul:InvokeServer(Hate, 2)
+    end)
+
+    if success then
+        return unpack(result)
+    end
+end
 
 SpellsTab:CreateToggle({
     Name = "Low Cooldown Spells",
