@@ -301,34 +301,6 @@ SpellsTab:CreateToggle({
     end,
 })
 
-local oldFireServer = UseSpellRemote.FireServer
-UseSpellRemote.FireServer = function(self, ...)
-    if self ~= UseSpellRemote or not LowCooldownEnabled then
-        return oldFireServer(self, ...)
-    end
-
-    -- ANTES do cast (Patience nas duas almas)
-    pcall(function()
-        ChangeSoul:InvokeServer(Patience, 1)
-        ChangeSoul:InvokeServer(Patience, 2)
-    end)
-
-    -- Executa o cast original
-    local success, result = pcall(function(...)
-        return {oldFireServer(self, ...)}
-    end, ...)
-
-    -- DEPOIS do cast (DT + Hate)
-    pcall(function()
-        ChangeSoul:InvokeServer(Determination, 1)
-        ChangeSoul:InvokeServer(Hate, 2)
-    end)
-
-    if success then
-        return unpack(result)
-    end
-end
-
 SpellsTab:CreateToggle({
     Name = "Low Cooldown Spells",
     CurrentValue = false,
@@ -392,4 +364,35 @@ ConfigTab:CreateButton({
 		Rayfield:Destroy() -- This completely erases the entire Rayfield UI, all tabs, sections, toggles, connections, and memory traces
 	end,
 })
+
+local oldNamecall
+oldNamecall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
+    if not LowCooldownEnabled then
+        return oldNamecall(self, ...)
+    end
+
+    local method = getnamecallmethod()
+    if method == "FireServer" and self == UseSpellRemote then
+        -- ANTES do cast
+        pcall(function()
+            ChangeSoul:InvokeServer(Patience, 1)
+            ChangeSoul:InvokeServer(Patience, 2)
+        end)
+
+        -- Cast original
+        local args = {...}
+        local results = {oldNamecall(self, unpack(args))}
+
+        -- DEPOIS do cast
+        pcall(function()
+            ChangeSoul:InvokeServer(Determination, 1)
+            ChangeSoul:InvokeServer(Hate, 2)
+        end)
+
+        return unpack(results)
+    end
+
+    return oldNamecall(self, ...)
+end))
+
 Rayfield:LoadConfiguration()
