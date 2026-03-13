@@ -12,9 +12,9 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/MikeGames573/MySCPTs/refs/heads/main/RF%20(No%20blotware%20edition).lua'))()
 local Window = Rayfield:CreateWindow({
-    Name = "Undertale Dungeons Go Beyond v1.6.1g",
+    Name = "Undertale Dungeons Go Beyond v1.5.2",
     Icon = 0,
-    LoadingTitle = "Undertale Dungeons Go Beyond v1.6.1g",
+    LoadingTitle = "Undertale Dungeons Go Beyond v1.5.2",
     LoadingSubtitle = "Made by Heli",
     ConfigurationSaving = {
         Enabled = true,
@@ -44,12 +44,12 @@ local slotMap = {
     [Enum.KeyCode.Four] = 4, [Enum.KeyCode.F] = 4,
 }
 
-local LowCooldownEnabled = false
-local SoulsFolder = ReplicatedStorage:WaitForChild("Souls")
-local Patience = SoulsFolder:WaitForChild("Patience")
-local Determination = SoulsFolder:WaitForChild("Determination")
-local Hate = SoulsFolder:WaitForChild("Hate")
-local ChangeSoul = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("ChangeSoul")
+local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+local Souls = ReplicatedStorage:WaitForChild("Souls")
+local Patience = Souls:WaitForChild("Patience")
+local Determination = Souls:WaitForChild("Determination")
+local Hate = Souls:WaitForChild("Hate")
+local ChangeSoul = Remotes:WaitForChild("ChangeSoul")
 
 local selectedTrinkets = {}
 local trinketSpamConnection = nil
@@ -300,30 +300,6 @@ SpellsTab:CreateToggle({
         end
     end,
 })
-
-SpellsTab:CreateToggle({
-    Name = "Low Cooldown Spells",
-    CurrentValue = false,
-    Flag = "LowCooldownSpells",
-    Callback = function(Value)
-        LowCooldownEnabled = Value
-        if Value then
-            Rayfield:Notify({
-                Title = "Low Cooldown Spells",
-                Content = "Ativado!\nPatience antes do cast → DT/Hate depois.\nFunciona com Force Cast também!",
-                Duration = 6,
-                Image = "zap"
-            })
-        else
-            Rayfield:Notify({
-                Title = "Low Cooldown Spells",
-                Content = "Desativado.",
-                Duration = 3,
-                Image = "x"
-            })
-        end
-    end,
-})
 -- =============================================
 -- CONFIG TAB
 -- =============================================
@@ -365,32 +341,3 @@ ConfigTab:CreateButton({
 	end,
 })
 Rayfield:LoadConfiguration()
-local oldNamecall
-oldNamecall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
-    if not LowCooldownEnabled then
-        return oldNamecall(self, ...)
-    end
-
-    local method = getnamecallmethod()
-    if method == "FireServer" and self == UseSpellRemote then
-        -- ANTES do cast
-        pcall(function()
-            ChangeSoul:InvokeServer(Patience, 1)
-            ChangeSoul:InvokeServer(Patience, 2)
-        end)
-
-        -- Cast original
-        local args = {...}
-        local results = {oldNamecall(self, unpack(args))}
-
-        -- DEPOIS do cast
-        pcall(function()
-            ChangeSoul:InvokeServer(Determination, 1)
-            ChangeSoul:InvokeServer(Hate, 2)
-        end)
-
-        return unpack(results)
-    end
-
-    return oldNamecall(self, ...)
-end))
