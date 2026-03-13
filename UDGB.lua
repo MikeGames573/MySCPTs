@@ -12,9 +12,9 @@ end
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/MikeGames573/MySCPTs/refs/heads/main/RF%20(No%20blotware%20edition).lua'))()
 local Window = Rayfield:CreateWindow({
-    Name = "Undertale Dungeons Go Beyond v1.6",
+    Name = "Undertale Dungeons Go Beyond v1.6.1",
     Icon = 0,
-    LoadingTitle = "Undertale Dungeons Go Beyond v1.6",
+    LoadingTitle = "Undertale Dungeons Go Beyond v1.6.1",
     LoadingSubtitle = "Made by Heli",
     ConfigurationSaving = {
         Enabled = true,
@@ -34,6 +34,8 @@ local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TeleportService = game:GetService("TeleportService")
 local RunService = game:GetService("RunService")
+local ContextActionService = game:GetService("ContextActionService")
+local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 local UseSpellRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("UseSpell")
 local ForceCastEnabled = false
@@ -274,53 +276,70 @@ end
 -- =============================================
 SpellsTab:CreateSection("Spell Modifiers")
 
-local ContextActionService = game:GetService("ContextActionService")
-
-local function HandleSpellCast(actionName, inputState, inputObject)
-	if inputState ~= Enum.UserInputState.Begin then
-		return Enum.ContextActionResult.Pass
-	end
-	
-	local slot = slotMap[inputObject.KeyCode]
-	if not slot then
-		return Enum.ContextActionResult.Pass
-	end
-	
-	-- Pega a spell equipada
-	local spellObj
-	pcall(function()
-		local InventoryModule = require(ReplicatedStorage.Modules.Inventory)
-		spellObj = InventoryModule.GetEqSpell(player, slot)
-	end)
-	
-	if not spellObj then
-		return Enum.ContextActionResult.Pass
-	end
-	
-	-- ==================== LÓGICA DOS TOGGLES ====================
-	if ForceCastLowerCooldownEnabled then
-		-- === ANTES DO CAST (lower cooldown) ===
-		ChangeSoulRemote:InvokeServer(SoulsFolder.Patience, 1)
-		ChangeSoulRemote:InvokeServer(SoulsFolder.Patience, 2)
-		
-		-- === CAST ===
-		UseSpellRemote:FireServer(spellObj)
-		task.wait(0.05)
-		-- === DEPOIS DO CAST ===
-		ChangeSoulRemote:InvokeServer(SoulsFolder.Determination, 1)
-		ChangeSoulRemote:InvokeServer(SoulsFolder.Hate, 2)
-		
-		return Enum.ContextActionResult.Sink
-		
-	elseif ForceCastEnabled then
-		-- === CAST NORMAL (só bypass) ===
-		UseSpellRemote:FireServer(spellObj)
-		return Enum.ContextActionResult.Sink
-	end
-	
-	-- Nenhum toggle ativo → deixa o jogo usar normalmente
-	return Enum.ContextActionResult.Pass
+local ShowCooldownTextEnabled = false
+local spellCDTimes = {}
+local SpellsFrame = game.Players.LocalPlayer.PlayerGui:FindFirstChild("SpellsFrame", true)
+if not SpellsFrame then
+    SpellsFrame = game.Players.LocalPlayer.PlayerGui:WaitForChild("Inventory", 5):FindFirstChild("SpellsFrame", true)
 end
+
+local function HandleSpellCast(_, inputState, inputObject)
+    if inputState ~= Enum.UserInputState.Begin then return Enum.ContextActionResult.Pass end
+    local slot = slotMap[inputObject.KeyCode]
+    if not slot then return Enum.ContextActionResult.Pass end
+
+    local spellObj
+    pcall(function()
+        spellObj = require(ReplicatedStorage.Modules.Inventory).GetEqSpell(player, slot)
+    end)
+    if not spellObj then return Enum.ContextActionResult.Pass end
+
+    if ForceCastLowerCooldownEnabled then
+        ChangeSoulRemote:InvokeServer(SoulsFolder.Patience, 1)
+        ChangeSoulRemote:InvokeServer(SoulsFolder.Patience, 2)
+        UseSpellRemote:FireServer(spellObj)
+        task.wait(0.05)
+        ChangeSoulRemote:InvokeServer(SoulsFolder.Determination, 1)
+        ChangeSoulRemote:InvokeServer(SoulsFolder.Hate, 2)
+    elseif ForceCastEnabled then
+        UseSpellRemote:FireServer(spellObj)
+    else
+        return Enum.ContextActionResult.Pass
+    end
+
+    -- VISUAL + TRACK (igual ao jogo normal)
+    local spellFrame = SpellsFrame and SpellsFrame:FindFirstChild(tostring(slot))
+    if spellFrame then
+        spellFrame.Frame.Size = UDim2.new(1,0,-1,0)
+        spellFrame.Cooldown.Value = true
+
+        local cd = require(ReplicatedStorage.Modules.Inventory).GetSpellCooldown(player, spellObj) -- EXATO como o UseSpell normal
+        spellCDTimes[slot] = {start = tick(), duration = cd}
+
+        local tween = TweenService:Create(spellFrame.Frame, TweenInfo.new(cd, Enum.EasingStyle.Linear), {Size = UDim2.new(1,0,0,0)})
+        tween:Play()
+    end
+
+    return Enum.ContextActionResult.Sink
+end
+
+if SpellsFrame then
+    for i = 1,4 do
+        local frame = SpellsFrame:FindFirstChild(tostring(i))
+        if frame then
+            frame.Cooldown.Changed:Connect(function()
+                if frame.Cooldown.Value == true then
+                    local spellObj = require(ReplicatedStorage.Modules.Inventory).GetEqSpell(player, i)
+                    if spellObj then
+                        local cd = require(ReplicatedStorage.Modules.Inventory).GetSpellCooldown(player, spellObj)
+                        spellCDTimes[i] = {start = tick(), duration = cd}
+                    end
+                end
+            end)
+        end
+    end
+end
+
 
 -- Bind permanente das teclas (só 1 vez)
 ContextActionService:BindAction(
@@ -355,6 +374,46 @@ SpellsTab:CreateToggle({
 		end
 	end,
 })
+
+SpellsTab:CreateToggle({
+    Name = "Show Real-Time",
+    CurrentValue = false,
+    Flag = "ShowCooldownText",
+    Callback = function(v)
+        ShowCooldownTextEnabled = v
+        if v and SpellsFrame then
+            task.spawn(function()
+                while ShowCooldownTextEnabled do
+                    for i = 1,4 do
+                        local frame = SpellsFrame:FindFirstChild(tostring(i))
+                        if frame and frame.Cooldown.Value and spellCDTimes[i] then
+                            local rem = spellCDTimes[i].duration - (tick() - spellCDTimes[i].start)
+                            if rem > 0 then
+                                if not frame:FindFirstChild("CDText") then
+                                    local txt = Instance.new("TextLabel")
+                                    txt.Name = "CDText"
+                                    txt.Size = UDim2.new(1,0,0.4,0)
+                                    txt.Position = UDim2.new(0,0,-0.45,0)
+                                    txt.BackgroundTransparency = 1
+                                    txt.TextColor3 = Color3.new(1,1,0)
+                                    txt.TextStrokeTransparency = 0
+                                    txt.Font = Enum.Font.GothamBold
+                                    txt.TextSize = 18
+                                    txt.Parent = frame
+                                end
+                                frame.CDText.Text = string.format("%.1fs", rem)
+                            elseif frame:FindFirstChild("CDText") then
+                                frame.CDText:Destroy()
+                            end
+                        end
+                    end
+                    task.wait(0.05)
+                end
+            end)
+        end
+    end
+})
+
 -- =============================================
 -- CONFIG TAB
 -- =============================================
